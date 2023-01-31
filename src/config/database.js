@@ -5,11 +5,12 @@ dotenv.config();
 
 const mongoClient = new MongoClient(process.env.DATABASE_URL);
 
-let db;
-
 try {
   await mongoClient.connect();
-  db = mongoClient.db();
 } catch (error) {
   console.log(error);
 }
+
+const db = mongoClient.db("drivencracy");
+
+export const pollCollection = db.collection("poll");
