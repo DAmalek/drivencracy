@@ -6,7 +6,12 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js";
 import choiceRoutes from "./routes/choice.routes.js";
+// const data = new Date();
+// const dataAtual = new Date(data.setHours(data.getHours() - 3));
 
+// const trintadias = new Date(dataAtual.setDate(dataAtual.getDate() + 30));
+
+// console.log(trintadias);
 const app = express();
 
 app.use(express.json());

@@ -14,7 +14,7 @@ export function choiceSchemaValidation(req, res, next) {
 
   if (error) {
     const errorMsg = error.details.map((e) => e.message);
-    return res.status(422).send("invalid data  ", errorMsg);
+    return res.status(422).send(errorMsg);
   }
 
   res.locals.choice = choice;
@@ -24,16 +24,17 @@ export function choiceSchemaValidation(req, res, next) {
 
 export async function choiceDatabaseValidation(req, res, next) {
   const choice = res.locals.choice;
-  const dataAtual = new Date();
-
+  const data = new Date();
   try {
     const pollExists = await pollCollection.findOne({
       _id: ObjectId(choice.pollId),
     });
+    const pollExpiredFormate = new Date(pollExists.expireAt);
+    console.log(pollExists.expireAt);
 
     if (!pollExists) return res.status(404).send("poll not found");
 
-    if (dataAtual > pollExists.expireAt) {
+    if (data > pollExpiredFormate) {
       return res.status(403).send("poll expired");
     }
 
@@ -53,7 +54,7 @@ export async function choiceDatabaseValidation(req, res, next) {
 }
 export async function voteValidation(req, res, next) {
   const choiceId = req.params.id;
-  const dataAtual = new Date();
+  const data = new Date();
 
   try {
     const choiceExists = await choiceCollection.findOne({
@@ -66,8 +67,9 @@ export async function voteValidation(req, res, next) {
     const pollExpired = await pollCollection.findOne({
       _id: ObjectId(choiceExists.pollId),
     });
+    const pollExpiredFormate = new Date(pollExpired.expireAt);
 
-    if (dataAtual > pollExpired.expireAt)
+    if (data > pollExpired.expireAt)
       return res.status(403).send("poll expired");
 
     next();

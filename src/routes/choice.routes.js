@@ -1,10 +1,14 @@
 import { Router } from "express";
-import { createChoice, listChoices } from "../controllers/choice.controller.js";
+import {
+  createChoice,
+  listChoices,
+  makeVote,
+} from "../controllers/choice.controller.js";
 import {
   choiceDatabaseValidation,
   choiceSchemaValidation,
+  voteValidation,
 } from "../middlewares/choice.middleware.js";
-import { choiceSchema } from "../schemas/choice.schema.js";
 
 const choiceRoutes = Router();
 
@@ -15,6 +19,6 @@ choiceRoutes.post(
   createChoice
 );
 choiceRoutes.get("/poll/:id/choice", listChoices);
-choiceRoutes.post("/poll/:id/vote");
+choiceRoutes.post("/poll/:id/vote", voteValidation, makeVote);
 
 export default choiceRoutes;
