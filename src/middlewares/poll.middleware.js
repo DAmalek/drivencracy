@@ -4,13 +4,15 @@ import utc from "dayjs/plugin/utc.js";
 
 export function pollSchemaValidation(req, res, next) {
   const { title, expireAt } = req.body;
-
-  // if (expireAt == undefined || expireAt == null) {
-  //  expireAt = dayjs().add(30, "d").format("YYYY-MM-DD");
-  //  }
-  dayjs.extend(utc);
-  if (!expireAt)
-    expireAt = dayjs.utc().local().add(30, "d").format("YYYY-MM-DD HH:mm");
+  const dataAtual = new Date();
+  const dataFormat = new Date(expireAt);
+  if (expireAt == "") {
+    const trintadias = new Date(dataAtual.setDate(dataAtual.getDate() + 30));
+    expireAt = trintadias;
+  }
+  if (dataFormat < dataAtual) {
+    return res.status(406).send("date not acceptable");
+  }
 
   const poll = {
     title,

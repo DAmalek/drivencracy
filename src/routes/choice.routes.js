@@ -15,5 +15,6 @@ choiceRoutes.post(
   createChoice
 );
 choiceRoutes.get("/poll/:id/choice", listChoices);
+choiceRoutes.post("/poll/:id/vote");
 
 export default choiceRoutes;

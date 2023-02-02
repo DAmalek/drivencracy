@@ -9,17 +9,6 @@ import choiceRoutes from "./routes/choice.routes.js";
 
 const app = express();
 
-//
-// dayjs.extend(utc);
-
-// const hj = dayjs.utc().local().format("YYYY-MM-DD HH:mm");
-// const dataValida = dayjs(hj).isBefore(
-//   dayjs(2023 - 12 - 31, "month").format("YYYY-MM-DD HH:mm")
-// );
-
-// console.log(dataValida, `hoje: ${hj}`);
-
-//
 app.use(express.json());
 app.use(cors());
 app.use([pollRoutes, choiceRoutes]);

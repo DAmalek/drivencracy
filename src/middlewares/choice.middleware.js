@@ -24,6 +24,7 @@ export function choiceSchemaValidation(req, res, next) {
 
 export async function choiceDatabaseValidation(req, res, next) {
   const choice = res.locals.choice;
+  const dataAtual = new Date();
 
   try {
     const pollExists = await pollCollection.findOne({
@@ -32,6 +33,10 @@ export async function choiceDatabaseValidation(req, res, next) {
 
     if (!pollExists) return res.status(404).send("poll not found");
 
+    if (dataAtual > pollExists.expireAt) {
+      return res.status(403).send("poll expired");
+    }
+
     const choiceExists = await choiceCollection.findOne({
       title: choice.title,
     });
@@ -39,6 +44,31 @@ export async function choiceDatabaseValidation(req, res, next) {
     if (choiceExists) {
       return res.status(409).send("choice already exists");
     }
+
+    next();
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Houve um problema no servidor");
+  }
+}
+export async function voteValidation(req, res, next) {
+  const choiceId = req.params.id;
+  const dataAtual = new Date();
+
+  try {
+    const choiceExists = await choiceCollection.findOne({
+      _id: ObjectId(choiceId),
+    });
+
+    if (!choiceExists)
+      return res.status(404).send("choice not found or doesnt exists");
+
+    const pollExpired = await pollCollection.findOne({
+      _id: ObjectId(choiceExists.pollId),
+    });
+
+    if (dataAtual > pollExpired.expireAt)
+      return res.status(403).send("poll expired");
 
     next();
   } catch (error) {
