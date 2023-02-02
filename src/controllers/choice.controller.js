@@ -1,4 +1,4 @@
-import { choiceCollection } from "../config/database.js";
+import { choiceCollection, voteCollection } from "../config/database.js";
 
 export async function createChoice(req, res) {
   const choice = res.locals.choice;
@@ -22,6 +22,22 @@ export async function listChoices(req, res) {
       return res.status(404).send("error404: poll or choices not found");
 
     return res.status(201).send(choices);
+  } catch (error) {
+    console.log("pego no catch:  ", error);
+    return res.sendStatus(500);
+  }
+}
+export async function makeVote(req, res) {
+  const choiceId = req.params.id;
+  const dataAtual = new Date();
+  const vote = {
+    choiceId,
+    createdAt: dataAtual,
+  };
+  try {
+    await voteCollection.insertOne(vote);
+
+    return res.status(201).send("ok... vote counted");
   } catch (error) {
     console.log("pego no catch:  ", error);
     return res.sendStatus(500);
