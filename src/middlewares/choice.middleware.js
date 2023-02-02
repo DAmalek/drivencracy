@@ -69,8 +69,7 @@ export async function voteValidation(req, res, next) {
     });
     const pollExpiredFormate = new Date(pollExpired.expireAt);
 
-    if (data > pollExpired.expireAt)
-      return res.status(403).send("poll expired");
+    if (data > pollExpiredFormate) return res.status(403).send("poll expired");
 
     next();
   } catch (error) {
