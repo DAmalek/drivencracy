@@ -31,7 +31,6 @@ export async function listPoll(req, res) {
 
 export async function listResult(req, res) {
   const pollIdParams = req.params.id;
-  let maior = [];
 
   try {
     const pollExists = await pollCollection.findOne({
@@ -48,13 +47,25 @@ export async function listResult(req, res) {
 
     if (!choiceExists) return res.status(404).send("choices not found");
 
-    const votes = choiceExists.map(async (i) => {
-      console.log(ObjectId(i._id).toString());
-      return await voteCollection
-        .find({ choiceId: ObjectId(i._id).toString() })
-        .toArray();
-    });
+    const votes = await Promise.all(
+      choiceExists.map(async (i) => {
+        console.log(ObjectId(i._id).toString(), "  ", choiceExists);
 
+        return await voteCollection
+          .find({ choiceId: ObjectId(i._id).toString() })
+          .toArray();
+      })
+    );
+
+    const result = {
+      _id: pollExists._id,
+      title: pollExists.title,
+      expireAt: pollExists.expireAt,
+      result: {
+        title: choiceExists.title,
+        votes: 487,
+      },
+    };
     return res.status(200).send(votes);
   } catch (error) {
     console.log("pego no catch:  ", error);
