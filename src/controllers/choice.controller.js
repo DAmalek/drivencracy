@@ -37,7 +37,7 @@ export async function makeVote(req, res) {
   try {
     await voteCollection.insertOne(vote);
 
-    return res.status(201).send("ok... vote counted");
+    return res.status(201).send(vote);
   } catch (error) {
     console.log("pego no catch:  ", error);
     return res.sendStatus(500);
