@@ -1,5 +1,9 @@
 import { ObjectId } from "mongodb";
-import { choiceCollection, pollCollection } from "../config/database.js";
+import {
+  choiceCollection,
+  pollCollection,
+  voteCollection,
+} from "../config/database.js";
 
 export async function createPoll(req, res) {
   const poll = res.locals.poll;
@@ -27,6 +31,7 @@ export async function listPoll(req, res) {
 
 export async function listResult(req, res) {
   const pollIdParams = req.params.id;
+  let maior = [];
 
   try {
     const pollExists = await pollCollection.findOne({
@@ -35,11 +40,22 @@ export async function listResult(req, res) {
 
     if (!pollExists) return res.status(404).send("poll not found");
 
-    const choiceExists = await choiceCollection.find({
-      pollId: pollExists._id,
-    }).toArray;
+    const choiceExists = await choiceCollection
+      .find({
+        pollId: pollIdParams,
+      })
+      .toArray();
 
     if (!choiceExists) return res.status(404).send("choices not found");
+
+    const votes = choiceExists.map(async (i) => {
+      console.log(ObjectId(i._id).toString());
+      return await voteCollection
+        .find({ choiceId: ObjectId(i._id).toString() })
+        .toArray();
+    });
+
+    return res.status(200).send(votes);
   } catch (error) {
     console.log("pego no catch:  ", error);
     return res.sendStatus(500);
