@@ -49,24 +49,36 @@ export async function listResult(req, res) {
 
     const votes = await Promise.all(
       choiceExists.map(async (i) => {
-        console.log(ObjectId(i._id).toString(), "  ", choiceExists);
-
         return await voteCollection
           .find({ choiceId: ObjectId(i._id).toString() })
           .toArray();
       })
     );
+    let aux = {
+      choiceId: "",
+      votes: 0,
+    };
+    for (let i = 0; i < votes.length; i++) {
+      if (votes[i].length > aux.votes) {
+        aux.choiceId = votes[i][0].choiceId;
+        aux.votes = votes[i].length;
+      }
+    }
+    const choiceTitle = await choiceCollection.findOne({
+      _id: ObjectId(aux.choiceId),
+    });
+    console.log(aux);
 
     const result = {
       _id: pollExists._id,
       title: pollExists.title,
       expireAt: pollExists.expireAt,
       result: {
-        title: choiceExists.title,
-        votes: 487,
+        title: choiceTitle.title,
+        votes: aux.votes,
       },
     };
-    return res.status(200).send(votes);
+    return res.status(200).send(result);
   } catch (error) {
     console.log("pego no catch:  ", error);
     return res.sendStatus(500);
